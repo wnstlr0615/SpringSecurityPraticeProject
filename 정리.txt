@@ -22,4 +22,16 @@ public String index(Model model, Principal principal){ //모델을 입력 하여
 의존성을 추가하여 시큐리티 연동
 시큐리티 추가 시 자동 설정으로 인해 모든 웹 페이지 접근 시 로그인 폼으로 이동
 -------------------------------------------------------------------------------------
+## 스프링 시큐리티 설정하기
+
+SpringSecurityConfig 추가
+WebSecurityConfigurerAdapter 를 상속 받아 오버 라이드를 통해 worngus
+
+http.authorizeRequests()  //접근 설정
+        .mvcMatchers("/", "/info").permitAll() //모두 허용
+        .mvcMatchers("/admin").hasRole("ADMIN") //자격 요건
+        .anyRequest().authenticated(); //로그인 사용자는 가능
+http.formLogin();
+http.httpBasic();
+-------------------------------------------------------------------------------------
 
