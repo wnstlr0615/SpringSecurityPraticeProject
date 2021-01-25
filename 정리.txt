@@ -46,3 +46,11 @@ protected void configure(AuthenticationManagerBuilder auth) throws Exception { /
 
 }
 -------------------------------------------------------------------------------------
+## 스프링 시큐리티 커스터마이징: JPA 연동
+AcountRepository 생성
+AccountService 생성
+AccountService 클래스에 UserDetailsService를 위임
+loadUserByUsername 메소드 구현
+
+password를 {인코더타입}비밀번호로 만들어 주지 않으면 생성되지 않음
+임의로 수동으로 {noop}password로 변형
