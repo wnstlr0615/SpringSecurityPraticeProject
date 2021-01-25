@@ -54,3 +54,17 @@ loadUserByUsername 메소드 구현
 
 password를 {인코더타입}비밀번호로 만들어 주지 않으면 생성되지 않음
 임의로 수동으로 {noop}password로 변형
+-------------------------------------------------------------------------------------
+
+## 스프링 시큐리티 커스터마이징: PasswordEncoder
+기존 수동으로 추가해주던 {noop}password 코드를
+스프링시큐리티에서 제공해주는 PassEncoder로 사용
+
+SpringSecurity doc
+https://docs.spring.io/spring-security/site/docs/5.4.2/reference/html5/#authentication-password-storage-dpe
+
+ @Bean
+    public PasswordEncoder passwordEncoder(){ //{noop}로 만들어줌
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+-------------------------------------------------------------------------------------
