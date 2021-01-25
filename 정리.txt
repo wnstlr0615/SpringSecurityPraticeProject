@@ -68,3 +68,36 @@ https://docs.spring.io/spring-security/site/docs/5.4.2/reference/html5/#authenti
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 -------------------------------------------------------------------------------------
+## 스프링 시큐리티 테스트 1부
+
+사용자 접근 확인 방법 #1(with 메소드 사용)
+ @Test
+public void admin_user() throws Exception {
+    mvc.perform(get("/admin").with(user("joon").roles("USER")))//User가 로그인했다고 가정
+            .andDo(print())
+            .andExpect(status().isForbidden());
+}
+
+사용자 접근 확인 방법 #2(@WithMockUser 사용 )
+@Test
+@WithMockUser(username = "joon",roles = {"ADMIN"})
+public void admin_admin() throws Exception {
+    mvc.perform(get("/admin"))//User가 로그인했다고 가정
+            .andDo(print())
+            .andExpect(status().isOk());
+}
+
+@WithAnonymousUser //익명 접근
+
+자주쓰는 조건 어노테이션화 하기
+@WithUser
+
+구현부
+@Retention(RetentionPolicy.RUNTIME)
+@WithMockUser(username = "joon",roles = {"USER"})
+public @interface WithUser {
+}
+-------------------------------------------------------------------------------------
+
+
+
