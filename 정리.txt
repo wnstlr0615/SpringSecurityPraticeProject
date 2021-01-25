@@ -34,4 +34,15 @@ http.authorizeRequests()  //접근 설정
 http.formLogin();
 http.httpBasic();
 -------------------------------------------------------------------------------------
+## 스프링 시큐리티 커스터마이징 :인메모리유저 추가
 
+class SecurityConfig
+ @Override
+protected void configure(AuthenticationManagerBuilder auth) throws Exception { // 사용자 추가 기능 메소드
+    auth.inMemoryAuthentication()
+            .withUser("joon").password("{noop}123").roles("USER")// {noop} Spring 5부터 사용가능 한 기본 비밀번호 인코더(암호화 x)
+            .and()
+            .withUser("admin").password("{noop}!@#").roles("ADMIN");//암호화 해서 전송
+
+}
+-------------------------------------------------------------------------------------
