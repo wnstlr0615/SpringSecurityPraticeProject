@@ -70,6 +70,8 @@ https://docs.spring.io/spring-security/site/docs/5.4.2/reference/html5/#authenti
 -------------------------------------------------------------------------------------
 ## 스프링 시큐리티 테스트 1부
 
+isForbidden() 403 에러 권한 없음
+
 사용자 접근 확인 방법 #1(with 메소드 사용)
  @Test
 public void admin_user() throws Exception {
@@ -98,6 +100,24 @@ public void admin_admin() throws Exception {
 public @interface WithUser {
 }
 -------------------------------------------------------------------------------------
+## 스프링 시큐리티 테스트 2부
+로그인 폼을 사용하여 로그인 여부 테스트
+성공 테스트{
+ mvc.perform(formLogin().user(account.getUsername()).password(password))
+                .andExpect(authenticated());//로그인 성공 여부
+}
+실패테스트{
+ mvc.perform(formLogin().user(account.getUsername()).password("12345"))
+                .andExpect(unauthenticated());
+}
 
+성공 확인 테스트에 경우 authenticated() 를 사용하고 실패의 경우 unauthenticated()를 사용한다.
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
+
+
+@Transactional
+다른 테스트들과 중복으로 사용되는 메소드들은 롤백 과정을 해준다.
+-------------------------------------------------------------------------------------
 
 
