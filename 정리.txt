@@ -2,5 +2,24 @@
 
 ## 스프링 웹 프로젝트 만들기
 기본 admin, dashboard, index, info API 컨트롤러 추가 및 템플릿추가
+
+SampleController
+public String index(Model model, Principal principal){ //모델을 입력 하여 템플릿에 Attribute값 주입 Principal을 통해 로그인 사용자 정보 받기
+    if(principal==null){
+        model.addAttribute("message", "Hello Spring Security");
+    }else{
+        model.addAttribute("message", "Hello "+principal.getName());
+    }
+    return "index";
+}
+-------------------------------------------------------------------------------------
+## 스프링 시큐리티 연동
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+의존성을 추가하여 시큐리티 연동
+시큐리티 추가 시 자동 설정으로 인해 모든 웹 페이지 접근 시 로그인 폼으로 이동
 -------------------------------------------------------------------------------------
 
