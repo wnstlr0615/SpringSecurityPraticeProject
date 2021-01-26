@@ -117,7 +117,141 @@ import static org.springframework.security.test.web.servlet.response.SecurityMoc
 
 
 @Transactional
-다른 테스트들과 중복으로 사용되는 메소드들은 롤백 과정을 해준다.
+다른 테스트들과 중복으로 사용되는 메소드들을 롤백 해준다.
+-------------------------------------------------------------------------------------
+## 스프링시큐리티 아키텍처
+## 10.	SecurityContextHolder와 Authentication
+SpringSecurityContextHolder 구조
+
+SpringSecurityContextHolder
+   SpringSecurityContext
+       Authentication    //Principal 과 GrantAuthorify(권한 정보) 제공
+          Principal    //사용자 정보
+
+Authentication
+-	Principal과 GrantAuthority 제공.
+
+Principal
+-	“누구"에 해당하는 정보.
+-	UserDetailsService에서 리턴한 그 객체.
+-	객체는 UserDetails 타입.
+GrantAuthority:
+-	“ROLE_USER”, “ROLE_ADMIN”등 Principal이 가지고 있는 “권한”을 나타낸다.
+-	인증 이후, 인가 및 권한 확인할 때 이 정보를 참조한다.
+
+UserDetails
+-	애플리케이션이 가지고 있는 유저 정보와 스프링 시큐리티가 사용하는 Authentication 객체 사이의 어댑터.
+UserDetailsService
+-	유저 정보를 UserDetails 타입으로 가져오는 DAO (Data Access Object) 인터페이스.
+
+Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+Object principal = authentication.getPrincipal();
+Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();//권한 정보
+Object credentials = authentication.getCredentials();
+boolean authenticated = authentication.isAuthenticated();//인증된 사용자인지 확인
+
+-------------------------------------------------------------------------------------
+## 11.	AuthenticationManager와 Authentication
+AuthenticationManager 가 Authentication 를 관리하고 인증을 통해 반환해준다.
+AuthenticationManager 에 등록된 여러 인증 수단을 통해 사용자 인증을 한 후
+Authentication을 반환한다.
+
+-------------------------------------------------------------------------------------
+## 12.	ThreadLocal
+같은 쓰레드 안에서 변수를 공유함
+public class AccountContext {
+    private static final ThreadLocal<Account> ACCOUNT_THREAD_LOCAL
+            = new ThreadLocal<>();
+    public static void setAccount(Account account) {
+        ACCOUNT_THREAD_LOCAL.set(account);
+    }
+    public static Account getAccount() {
+        return ACCOUNT_THREAD_LOCAL.get();
+    }
+}
+13.	Authencation과 SecurityContextHodler
+AuthenticationManager가 인증을 마친 뒤 리턴 받은 Authentication 객체의 행방은?
+
+UsernamePasswordAuthenticationFilter
+●	폼 인증을 처리하는 시큐리티 필터
+●	인증된 Authentication 객체를 SecurityContextHolder에 넣어주는 필터
+●	SecurityContextHolder.getContext().setAuthentication(authentication)
+
+SecurityContextPersisenceFilter
+●	SecurityContext를 HTTP session에 캐시(기본 전략)하여 여러 요청에서 Authentication을 공유할 수 있 공유하는 필터.
+●	SecurityContextRepository를 교체하여 세션을 HTTP session이 아닌 다른 곳에 저장하는 것도 가능하다.
+-------------------------------------------------------------------------------------
+## 14.	스프링 시큐리티 Filter와 FilterChainProxy
+스프링 시큐리티가 제공하는 필터들
+1.	WebAsyncManagerIntergrationFilter
+2.	SecurityContextPersistenceFilter
+3.	HeaderWriterFilter
+4.	CsrfFilter
+5.	LogoutFilter
+6.	UsernamePasswordAuthenticationFilter
+7.	DefaultLoginPageGeneratingFilter
+8.	DefaultLogoutPageGeneratingFilter
+9.	BasicAuthenticationFilter
+10.	RequestCacheAwareFtiler
+11.	SecurityContextHolderAwareReqeustFilter
+12.	AnonymouseAuthenticationFilter
+13.	SessionManagementFilter
+14.	ExeptionTranslationFilter
+15.	FilterSecurityInterceptor
+
+이 모든 필터는 FilterChainProxy가 호출한다.
+
 -------------------------------------------------------------------------------------
 
+## 15.	DelegatingFilterProxy와 FilterChainProxy
+
+DelegatingFilterProxy
+●	일반적인 서블릿 필터.
+●	서블릿 필터 처리를 스프링에 들어있는 빈으로 위임하고 싶을 때 사용하는 서블릿 필터.
+●	타겟 빈 이름을 설정한다.
+●	스프링 부트 없이 스프링 시큐리티 설정할 때는 AbstractSecurityWebApplicationInitializer를 사용해서 등록.
+●	스프링 부트를 사용할 때는 자동으로 등록 된다. (SecurityFilterAutoConfiguration)
+
+FilterChainProxy
+●	보통 “springSecurityFilterChain” 이라는 이름의 빈으로 등록된다.
+
+-------------------------------------------------------------------------------------
+16.	AccessDecisionManager 1부
+ 인가를 전담하는 클래스
+ 여러개의 모터를 가지 포함하여 사용된다.
+
+ Access Control 결정을 내리는 인터페이스로, 구현체 3가지를 기본으로 제공한다.
+ ●	AffirmativeBased: 여러 Voter중에 한명이라도 허용하면 허용. 기본 전략.
+ ●	ConsensusBased: 다수결
+ ●	UnanimousBased: 만장일치
+
+ AccessDecisionVoter
+ ●	해당 Authentication이 특정한 Object에 접근할 때 필요한 ConfigAttributes를 만족하는지 확인한다.
+ ●	WebExpressionVoter: 웹 시큐리티에서 사용하는 기본 구현체, ROLE_Xxxx가 매치하는지 확인.
+ ●	RoleHierarchyVoter: 계층형 ROLE 지원. ADMIN > MANAGER > USER
+
+ -------------------------------------------------------------------------------------
+17.	AccessDecisionManager 2부
+
+권한 서열 적용 ROLE_ADMIN > ROLU_USER admin 권한은 User보다 권한이 높으므로 USER만 접근가능한 url에 접근가능해야한다.
+방법1 ROLE을 직접 여러개 넣어준다.
+방법2 RoleHieracrchyImpl 설정
+
+public SecurityExpressionHandler expressionHandler(){ // // 권한 세부 설정
+   RoleHierarchyImpl roleHierarchy=new RoleHierarchyImpl();
+   roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+   DefaultWebSecurityExpressionHandler handler=new DefaultWebSecurityExpressionHandler();
+   handler.setRoleHierarchy(roleHierarchy);
+    return handler;
+}
+protected void configure(HttpSecurity http) throws Exception {
+                                .
+                                .
+                .mvcMatchers("/user").hasRole("USER") //자격 요건
+                .anyRequest().authenticated()//로그인 사용자는 가능
+               // .accessDecisionManager(accessDecisionManager()) <- AccessDecisionManger로 설정 하는 방법
+                .expressionHandler(expressionHandler()) <- AccessDecisionManger 안에 있는 expressionHandler 로 접근 방법
+                                .
+}
+ -------------------------------------------------------------------------------------
 
