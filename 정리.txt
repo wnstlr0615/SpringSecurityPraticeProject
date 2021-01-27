@@ -322,7 +322,7 @@ SecurityContext가 등록되었는지 확인하고 사용자가 없으면 Securi
 크래커에 의해 외부 링크로 연결된 후 특정사이트에 외부에서 요청을 임의로 보내는 경우 해당 웹에서
  전송한 것 인지를 확인하기 위해 CSRF 토큰을 넣어서 보낸다.
  -------------------------------------------------------------------------------------
-28.	CSRF 토큰 사용 예제
+## 28.	CSRF 토큰 사용 예제
 signup Api를 만들어서 csrf 토큰 사용 방법
 
 @PostMapping
@@ -351,6 +351,31 @@ public void processSignUp() throws Exception {
             .andDo(print())
             .andExpect(status().is3xxRedirection());//리다이렉션 확인
 }
+-------------------------------------------------------------------------------------
+29.	로그아웃 처리 필터: LogoutFilter
+여러 LogoutHandler를 사용하여 로그아웃시 필요한 처리를 하며 이후에는 LogoutSuccessHandler를 사용하여 로그아웃 후 처리를 한다.
+
+http.logout()
+        .logoutUrl("/logout")
+        .logoutSuccessUrl("/")
+        .logoutRequestMatcher()
+        .invalidateHttpSession(true)
+        .deleteCookies()
+        .addLogoutHandler()
+        .logoutSuccessHandler();
+
+LogoutHandler
+●	CsrfLogoutHandler
+●	SecurityContextLogoutHandler
+
+LogoutSuccessHandler
+●	SimpleUrlLogoutSuccessHandler
+-------------------------------------------------------------------------------------
+30.	폼 인증 처리 필터: UsernamePasswordAuthenticationFilter
+
+폼 로그인을 처리하는 인증 필터
+●	사용자가 폼에 입력한 username과 password로 Authentcation을 만들고 AuthenticationManager를 사용하여 인증을 시도한다.
+●	AuthenticationManager (ProviderManager)는 여러 AuthenticationProvider를 사용하여 인증을 시도하는데, 그 중에 DaoAuthenticationProvider는 UserDetailsServivce를 사용하여 UserDetails 정보를 가져와 사용자가 입력한 password와 비교한다.
 -------------------------------------------------------------------------------------
 
 
