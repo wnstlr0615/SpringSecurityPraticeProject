@@ -377,5 +377,32 @@ LogoutSuccessHandler
 ●	사용자가 폼에 입력한 username과 password로 Authentcation을 만들고 AuthenticationManager를 사용하여 인증을 시도한다.
 ●	AuthenticationManager (ProviderManager)는 여러 AuthenticationProvider를 사용하여 인증을 시도하는데, 그 중에 DaoAuthenticationProvider는 UserDetailsServivce를 사용하여 UserDetails 정보를 가져와 사용자가 입력한 password와 비교한다.
 -------------------------------------------------------------------------------------
+31.	DefaultLoginPageGeneratingFilter
+기본 로그인 폼 페이지를 생성해주는 필터
+●	GET /login 요청을 처리하는 필터.
+
+http.formLogin()
+    .usernameParameter("my-username")
+    .passwordParameter("my-password");
+    -------------------------------------------------------------------------------------
+32.	로그인/로그아웃 폼 커스터마이징
+Login, Logout API 생성
+http.formLogin()
+            .loginPage("/login")
+            .permitAll();
+<h1>Logout</h1>
+<form action="/logout" th:action="@{/logout}" method="post">
+    <p><input type="submit" value="Logout" /></p>
+</form>
+<form action="/login" th:action="@{/login}" method="post">
+    <p>Username: <input type="text" name="username" /></p>
+    <p>Password: <input type="password" name="password" /></p>
+    <p><input type="submit" value="SignIn" /></p>
+</form>
+-------------------------------------------------------------------------------------
+
+
+
+
 
 

@@ -39,7 +39,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .expressionHandler(expressionHandler())
             // .accessDecisionManager(accessDecisionManager())
         ;
-        http.formLogin();
+        http.formLogin()
+            .loginPage("/login")
+            .permitAll()
+        ;
         http.httpBasic();
        // SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);//ThreadLocal 하위 범위까지 공유하도록 설정
     }
