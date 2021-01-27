@@ -253,8 +253,8 @@ protected void configure(HttpSecurity http) throws Exception {
                 .expressionHandler(expressionHandler()) <- AccessDecisionManger 안에 있는 expressionHandler 로 접근 방법
                                 .
 }
- -------------------------------------------------------------------------------------
-21.	스프링 시큐리티 ignoring() 1부
+-------------------------------------------------------------------------------------
+## 21.	스프링 시큐리티 ignoring() 1부
 
 웹 브라우저가 자동으로
 localhost:8080/favicon.ico 요청 시 설정에 따라 로그인 요청을 보내게 됨
@@ -264,3 +264,24 @@ localhost:8080/favicon.ico 요청 시 설정에 따라 로그인 요청을 보�
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());// favicon.ico 등 리소스 허용
     }
     다음과 같이 리소스 요청을 모두 권한없이 접근 할 수 있도록 해준다
+
+-------------------------------------------------------------------------------------
+## 21.	스프링 시큐리티 ignoring() 2부
+다음과 같이 HttpSecurity 에서도 요청을 허용 할 수 있지만 여러 필터를 사용하면서 자원을 낭비하기 때문에
+WebSecurity에서 해주는 것이 좋다.
+  @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()  //접근 설정
+                .mvcMatchers("/", "/info", "/account/**").permitAll() //모두 허용
+                .mvcMatchers("/admin").hasRole("ADMIN") //자격 요건
+                .mvcMatchers("/user").hasRole("USER") //자격 요건
+                //.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() 결과는 같지만 요청시간 이 오래 걸림
+                .anyRequest().authenticated()//로그인 사용자는 가능
+                .expressionHandler(expressionHandler())
+            // .accessDecisionManager(accessDecisionManager())
+        ;
+        http.formLogin();
+        http.httpBasic();
+}
+
+-------------------------------------------------------------------------------------

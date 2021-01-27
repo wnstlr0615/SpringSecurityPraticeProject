@@ -37,6 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/", "/info", "/account/**").permitAll() //모두 허용
                 .mvcMatchers("/admin").hasRole("ADMIN") //자격 요건
                 .mvcMatchers("/user").hasRole("USER") //자격 요건
+                //.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() 결과는 같지만 요청시간 이 오래 걸림
                 .anyRequest().authenticated()//로그인 사용자는 가능
                 .expressionHandler(expressionHandler())
             // .accessDecisionManager(accessDecisionManager())
