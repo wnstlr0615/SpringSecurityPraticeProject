@@ -322,6 +322,35 @@ SecurityContext가 등록되었는지 확인하고 사용자가 없으면 Securi
 크래커에 의해 외부 링크로 연결된 후 특정사이트에 외부에서 요청을 임의로 보내는 경우 해당 웹에서
  전송한 것 인지를 확인하기 위해 CSRF 토큰을 넣어서 보낸다.
  -------------------------------------------------------------------------------------
+28.	CSRF 토큰 사용 예제
+signup Api를 만들어서 csrf 토큰 사용 방법
 
+@PostMapping
+public String processSignUp(@ModelAttribute Account account){ // 회원 가입 요청시
+    account.setRole("USER");
+    accountService.createUser(account);
+    return "redirect:/"; //홈으로 이동
+}
+
+
+@Test
+public void signUpForm() throws Exception {
+    mvc.perform(get("/signup"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("_csrf"))) // html에 포함된 _csrf문구확인
+    ;
+}
+
+@Test
+public void processSignUp() throws Exception {
+    mvc.perform(post("/signup")
+            .param("username", "joon")  //파라미터 입력
+            .param("password", "123")
+            .with(csrf()) //csrf 토큰을 넣는 방법
+    )
+            .andDo(print())
+            .andExpect(status().is3xxRedirection());//리다이렉션 확인
+}
+-------------------------------------------------------------------------------------
 
 
