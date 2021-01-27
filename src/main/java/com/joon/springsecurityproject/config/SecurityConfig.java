@@ -8,14 +8,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-
-
     public SecurityExpressionHandler expressionHandler(){ // // 권한 세부 설정
        RoleHierarchyImpl roleHierarchy=new RoleHierarchyImpl();
        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
@@ -23,12 +22,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
        handler.setRoleHierarchy(roleHierarchy);
         return handler;
    }
-
-
     @Override
     public void configure(WebSecurity web) throws Exception {
         //web.ignoring().mvcMatchers("/favicon.ico");
-        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());// favicon.ico 등 리소스 허용
+        web.ignoring().mvcMatchers("/favicon.ico");
+        //web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());// favicon.ico 등 리소스 허용
     }
 
     @Override
@@ -44,7 +42,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         ;
         http.formLogin();
         http.httpBasic();
+       // SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);//ThreadLocal 하위 범위까지 공유하도록 설정
     }
+
 
 
 
