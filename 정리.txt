@@ -285,14 +285,24 @@ WebSecurity에서 해주는 것이 좋다.
 }
 
 -------------------------------------------------------------------------------------
-23.	Async 웹 MVC를 지원하는 필터:
+## 23.	Async 웹 MVC를 지원하는 필터:
 
 WebAsyncManagerIntegrationFilter 필터는  스프링 MVC의 Async 기능(핸들러에서 Callable을 리턴할 수 있는 기능)을
 사용할 때에도 SecurityContext를 공유하도록 도와주는 필터.
 -------------------------------------------------------------------------------------
-24.	스프링 시큐리티와 @Async
+## 24.	스프링 시큐리티와 @Async
 @Async를 사용 하여 서비스를 호출하는 경우 쓰레드가 달라서 SecurityContext를 공유받지 못하는데
 configure(HttpSecurity http)에
  SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);//ThreadLocal 하위 범위까지 공유하도록 설정
  다음과 같이 등록하면 사용 가능
  강의 참조
+-------------------------------------------------------------------------------------
+## 25.	SecurityContext 영속화 필터: SecurityContextPersistenceFilter
+
+SecurityContextRepository를 사용해서 기존의 SecurityContext를 읽어오거나 초기화 한다.
+●	기본으로 사용하는 전략은 HTTP Session을 사용한다.
+●	Spring-Session과 연동하여 세션 클러스터를 구현할 수 있다. (이 강좌에서는 다루지 않습니다.)
+
+SecurityContext가 등록되었는지 확인하고 사용자가 없으면 SecurityContext를 초기화한다.
+-------------------------------------------------------------------------------------
+

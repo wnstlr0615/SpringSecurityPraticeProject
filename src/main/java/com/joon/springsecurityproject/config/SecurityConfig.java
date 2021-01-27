@@ -25,8 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         //web.ignoring().mvcMatchers("/favicon.ico");
-        web.ignoring().mvcMatchers("/favicon.ico");
-        //web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());// favicon.ico 등 리소스 허용
+        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());// favicon.ico 등 리소스 허용
     }
 
     @Override
