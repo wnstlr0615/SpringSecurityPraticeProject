@@ -1,6 +1,7 @@
 package com.joon.springsecurityproject.config;
 
 import com.joon.springsecurityproject.account.AccountService;
+import com.joon.springsecurityproject.common.LogginFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.addFilterBefore(new LogginFilter(), WebAsyncManagerIntegrationFilter.class);
         http.authorizeRequests()  //접근 설정
                 .mvcMatchers("/", "/info", "/account/**", "/signup").permitAll() //모두 허용
                 .mvcMatchers("/admin").hasRole("ADMIN") //자격 요건

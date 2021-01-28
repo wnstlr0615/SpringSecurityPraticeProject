@@ -496,3 +496,20 @@ http.authorizeRequests()
                 .key("remember-me-sample");
 
 -------------------------------------------------------------------------------------
+41.	커스텀 필터 추가하기
+필터 추가하기
+http.addFilterBefore(new LogginFilter(), WebAsyncManagerIntegrationFilter.class);
+
+public class LogginFilter  extends GenericFilterBean { //커스텀 필터
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        StopWatch stopWatch=new StopWatch();
+        stopWatch.start(((HttpServletRequest)servletRequest).getRequestURI());
+        filterChain.doFilter(servletRequest, servletResponse); //안하면 안넘어감
+        stopWatch.stop();
+        logger.info(stopWatch.prettyPrint());
+    }
+}
+-------------------------------------------------------------------------------------
+
