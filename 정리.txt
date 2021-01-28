@@ -450,7 +450,7 @@ https://docs.spring.io/spring-security/site/docs/5.1.5.RELEASE/reference/htmlsin
 
 
 -------------------------------------------------------------------------------------
-38.	인증/인가 예외 처리 필터: ExceptionTranslationFilter
+## 38.	인증/인가 예외 처리 필터: ExceptionTranslationFilter
 
 ExceptionTranslatorFilter 에서 예외를 검증해서 FilterSecurityInterceptor에게 전달해줌
 
@@ -474,9 +474,25 @@ http.exceptionHandling() //ExceptionTranslationFilter 커스터 마이징
         }
     })
 ;
+-------------------------------------------------------------------------------------
+## 39.	인가 처리 필터: FilterSecurityInterceptor
+
+http.authorizeRequests()
+        .mvcMatchers("/", "/info", "/account/**", "/signup").permitAll()
+        .mvcMatchers("/admin").hasAuthority("ROLE_ADMIN")  //ROLE_을 붙여 줘야 한다.
+        .mvcMatchers("/user").hasRole("USER")
+        .anyRequest().authenticated()
+        .expressionHandler(expressionHandler());
 
 -------------------------------------------------------------------------------------
+40.	토큰 기반 인증 필터 : RememberMeAuthenticationFilter
+세션이 사라지거나 만료가 되더라도 쿠키 또는 DB를 사용하여 저장된 토큰 기반으로 인증을 지원하는 필터
 
+ http.rememberMe()
+                .userDetailsService(accountService)
+              //  .alwaysRemember(false)// true일 경우 모든 요청을 remember로 사용
+              //  .tokenValiditySeconds()//쿠기 시간 설정
+              //  .useSecureCookie(true )//https로만 접근 가능하도록 설정
+                .key("remember-me-sample");
 
-
-
+-------------------------------------------------------------------------------------

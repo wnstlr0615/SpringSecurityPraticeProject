@@ -1,5 +1,7 @@
 package com.joon.springsecurityproject.config;
 
+import com.joon.springsecurityproject.account.AccountService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,6 +24,9 @@ import java.io.IOException;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    AccountService accountService;
+
     public SecurityExpressionHandler expressionHandler(){ // // 권한 세부 설정
        RoleHierarchyImpl roleHierarchy=new RoleHierarchyImpl();
        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
@@ -51,6 +56,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .permitAll()
         ;
 
+        http.rememberMe()
+                .userDetailsService(accountService)
+              //  .alwaysRemember(false)// true일 경우 모든 요청을 remember로 사용
+              //  .tokenValiditySeconds()//쿠기 시간 설정
+              //  .useSecureCookie(true )//https로만 접근 가능하도록 설정
+                .key("remember-me-sample");
 
         http.exceptionHandling() //ExceptionTranslationFilter 커스터 마이징
         //        .accessDeniedPage("/access-denied")  //페이지 전환
