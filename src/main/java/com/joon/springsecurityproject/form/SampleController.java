@@ -2,6 +2,7 @@ package com.joon.springsecurityproject.form;
 
 import com.joon.springsecurityproject.account.Account;
 import com.joon.springsecurityproject.account.UserAccount;
+import com.joon.springsecurityproject.book.BookRepository;
 import com.joon.springsecurityproject.common.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +17,9 @@ public class SampleController {
 
     @Autowired
     SampleService sampleService;
+    @Autowired
+    BookRepository bookRepository;
+
     @GetMapping("/")
   //  public String index(Model model, Principal principal){ 변경 전
   //   public String index(Model model, @AuthenticationPrincipal UserAccount userAccount){
@@ -47,7 +51,7 @@ public class SampleController {
     @GetMapping("/user")
     public String user(Model model, Principal principal){
         model.addAttribute("message", "Hello user"+principal.getName());
-        sampleService.dashboard();
+        model.addAttribute("books", bookRepository.findcurrentUserBook());
         return "user";
     }
 

@@ -543,7 +543,7 @@ Sec 네임스페이스 사용하기
     <a href="/login" th:href="@{/login}">Login</a>
 </div>
 -------------------------------------------------------------------------------------
-44.	메소드 시큐리티
+## 44.	메소드 시큐리티
 데스크탑 환경에 프로그램에서 로그인 테스트시 메소드 시큐리티를 사용한다.
 
 @Configuration
@@ -590,7 +590,7 @@ public class MethodSecurity extends GlobalMethodSecurityConfiguration {
         return super.authenticationManagerBean();
     }
 -------------------------------------------------------------------------------------
-45.	@AuthenticationPrincipal
+## 45.	@AuthenticationPrincipal
 
 사용자에 정보를 Principal 말고 다른 유형 으로 받는 방법
  //  public String index(Model model, Principal principal){ 변경 전
@@ -611,4 +611,23 @@ public class UserAccount extends User {
 }
 다음 과 같이 User 클래스를 상속 받아서 사용
 -------------------------------------------------------------------------------------
+## 46.	스프링 데이터 연동
+   @Query("select b from Book b where b.author.id=?#{principal.account.id}")
+@Query 애노테이션에서 SpEL로 principal 참조할 수 있는 기능 제공.
 
+스프링 시큐리티 데이터 의존성 추가
+<dependency>
+	<groupId>org.springframework.security</groupId>
+	<artifactId>spring-security-data</artifactId>
+	<version>${spring-security.version}</version>
+</dependency>
+
+@Query에서 principal 사용하기
+    @Query("select b from Book b where b.author.id = ?#{principal.account.id}")
+    List<Book> findCurrentUserBooks();
+
+타임리프 리스트 참조
+    <tr th:each="book : ${books}">
+        <td><span th:text="${book.title}"> Title </span></td>
+    </tr>
+-------------------------------------------------------------------------------------
