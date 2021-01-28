@@ -485,7 +485,7 @@ http.authorizeRequests()
         .expressionHandler(expressionHandler());
 
 -------------------------------------------------------------------------------------
-40.	토큰 기반 인증 필터 : RememberMeAuthenticationFilter
+## 40.	토큰 기반 인증 필터 : RememberMeAuthenticationFilter
 세션이 사라지거나 만료가 되더라도 쿠키 또는 DB를 사용하여 저장된 토큰 기반으로 인증을 지원하는 필터
 
  http.rememberMe()
@@ -496,7 +496,7 @@ http.authorizeRequests()
                 .key("remember-me-sample");
 
 -------------------------------------------------------------------------------------
-41.	커스텀 필터 추가하기
+## 41.	커스텀 필터 추가하기
 필터 추가하기
 http.addFilterBefore(new LogginFilter(), WebAsyncManagerIntegrationFilter.class);
 
@@ -512,7 +512,7 @@ public class LogginFilter  extends GenericFilterBean { //커스텀 필터
     }
 }
 -------------------------------------------------------------------------------------
-42.	타임리프 스프링 시큐리티 확장팩
+## 42.	타임리프 스프링 시큐리티 확장팩
 <dependency>
 	<groupId>org.thymeleaf.extras</groupId>
 	<artifactId>thymeleaf-extras-springsecurity5</artifactId>
@@ -527,4 +527,66 @@ public class LogginFilter  extends GenericFilterBean { //커스텀 필터
 <div th:unless="${#authorization.expr('isAuthenticated()')}">
     <a href="/login" th:href="@{/login}">로그인</a>
     다음과 같이 Authentication 과 Authorization 에 접근 가능
+-------------------------------------------------------------------------------------
+## 43.	sec 네임스페이스
+기존 코드를 좀 더 안전하고 쉽게 작성할 수 있다.
+
+Sec 네임스페이스 등록
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+
+Sec 네임스페이스 사용하기
+<div sec:authorize="isAuthenticated()">
+    <h2 sec:authentication="name">Name</h2>
+    <a href="/logout" th:href="@{/logout}">Logout</a>
+</div>
+<div sec:authorize="!isAuthenticated()">
+    <a href="/login" th:href="@{/login}">Login</a>
+</div>
+-------------------------------------------------------------------------------------
+44.	메소드 시큐리티
+데스크탑 환경에 프로그램에서 로그인 테스트시 메소드 시큐리티를 사용한다.
+
+@Configuration
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, jsr250Enabled = true)//조건을 설정해주어야함
+public class MethodSecurity extends GlobalMethodSecurityConfiguration {
+    @Override
+    protected AccessDecisionManager accessDecisionManager() {//권한 서열 관계 추가
+        RoleHierarchyImpl roleHierarchy=new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+        AffirmativeBased accessDecisionManager=(AffirmativeBased) super.accessDecisionManager();
+        accessDecisionManager.getDecisionVoters().add(new RoleHierarchyVoter(roleHierarchy));
+        return accessDecisionManager;
+    }
+
+}
+▲ 다음과 같이 선언 해준다.
+ @Secured("ROLE_USER") //=@RolesAllowed("ROLE_USER"),  @PreAuthorize("hasRole('USER'") 메소드 호울 이전에 검사
+   //RoleHierarchyImpl를 사용하지 않을 경우    @Secured({"ROLE_USER", "ROLE_ADMIN"}) 로 권한을 줄 수 있음
+메소드에 다음과 같이 선언
+
+
+수동으로 인증방법
+
+@Test
+    //@WithMockUser로 대체 가능
+    public void dashboard_user(){
+        Account account=Account.builder()
+                        .username("joon")
+                        .password("1234")
+                        .role("USER")
+                        .build();
+        accountService.createUser(account); //계정 생성
+        UserDetails userDetails = accountService.loadUserByUsername(account.getUsername()); //UserDetails로 변환
+        UsernamePasswordAuthenticationToken token=new UsernamePasswordAuthenticationToken(userDetails,"1234");//credentials는 패스워드
+        Authentication authentication = authenticationManager.authenticate(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        sampleService.dashboard();
+
+▲위에서 AuthenticationManager을 사용하기위해서 SecurityConfig에 AuthenticationManager을 빈으로 등록해야한다
+
+@Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 -------------------------------------------------------------------------------------
