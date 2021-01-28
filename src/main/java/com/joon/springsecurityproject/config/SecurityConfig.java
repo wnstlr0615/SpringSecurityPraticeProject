@@ -2,15 +2,22 @@ package com.joon.springsecurityproject.config;
 
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -43,6 +50,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .loginPage("/login")
             .permitAll()
         ;
+
+
+        http.exceptionHandling() //ExceptionTranslationFilter 커스터 마이징
+        //        .accessDeniedPage("/access-denied")  //페이지 전환
+                    .accessDeniedHandler(new AccessDeniedHandler() { // 좀더 세부 적으러 기록 및 전화
+                        @Override
+                        public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                            UserDetails principal= (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                            String name=principal.getUsername();
+                            System.out.println(name+" is denied to access "+ request.getRequestURI());
+                            response.sendRedirect("/access-denied");
+                        }
+                    })
+        ;
+
+
       /*  세션 커스터 마이징
        http.sessionManagement()
                 .sessionFixation()
