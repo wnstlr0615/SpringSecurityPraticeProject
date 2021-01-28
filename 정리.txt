@@ -405,14 +405,14 @@ http.formLogin()
 ●	캐시된 요청이 없다면, 현재 요청 처리
 ●	캐시된 요청이 있다면, 해당 캐시된 요청 처리
 -------------------------------------------------------------------------------------
-35.	시큐리티 관련 서블릿 스팩 구현 필터: SecurityContextHolderAwareRequestFilter
+## 35.	시큐리티 관련 서블릿 스팩 구현 필터: SecurityContextHolderAwareRequestFilter
 시큐리티 관련 서블릿 API를 구현해주는 필터
 ●	HttpServletRequest#authenticate(HttpServletResponse)
 ●	HttpServletRequest#login(String, String)
 ●	HttpServletRequest#logout()
 ●	AsyncContext#start(Runnable)
 -------------------------------------------------------------------------------------
-36.	익명 인증 필터: AnonymousAuthenticationFilter
+## 36.	익명 인증 필터: AnonymousAuthenticationFilter
 https://docs.spring.io/spring-security/site/docs/5.1.5.RELEASE/reference/htmlsingle/#anonymous
 
 현재 SecurityContext에 Authentication이 null이면 “익명 Authentication”을 만들어 넣어주고, null이 아니면 아무일도 하지 않는다.
@@ -420,7 +420,36 @@ https://docs.spring.io/spring-security/site/docs/5.1.5.RELEASE/reference/htmlsin
 기본으로 만들어 사용할 “익명 Authentication” 객체를 설정할 수 있다.
 로그인되지 않은 사용자면 Authentication을 Anonymous를 넣어 준다.
 
+-------------------------------------------------------------------------------------
+## 37.	세션 관리 필터: SessionManagementFilter
 
+세션 커스터 마이징
+       http.sessionManagement()
+                .sessionFixation()
+                    .changeSessionId()
+                        .invalidSessionUrl("login") //세션 변경시 보내질 url
+                    .maximumSessions(1) // 한 계졍으로 접근 가능한 개수
+                        .maxSessionsPreventsLogin(true) //true 시 추가 로그인 허용 x
+                        .expiredUrl("/")  //외부에서 로그인 시도시 기존 앱에서 보내질 url
+                .and()
+                    .sessionCreationPolicy()//세션 생선 전략
+                    ;
+
+유효하지 않은 세션을 리다이렉트 시킬 URL 설정
+●	invalidSessionUrl
+
+동시성 제어: maximumSessions
+●	추가 로그인을 막을지 여부 설정 (기본값, false)
+●	https://docs.spring.io/spring-security/site/docs/5.1.5.RELEASE/reference/htmlsingle/#nsa-concurrency-control
+
+세션 생성 전략: sessionCreationPolicy
+●	IF_REQUIRED (기본값) : 필요하면 만든다.
+●	NEVER :이미 세션이 있으면 쓰지 않는다
+●	STATELESS  :세션 사용 x
+●	ALWAYS :
+
+
+-------------------------------------------------------------------------------------
 
 
 

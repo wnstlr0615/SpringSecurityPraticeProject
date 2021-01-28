@@ -43,6 +43,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .loginPage("/login")
             .permitAll()
         ;
+      /*  세션 커스터 마이징
+       http.sessionManagement()
+                .sessionFixation()
+                    .changeSessionId()
+                        .invalidSessionUrl("login") //세션 변경시 보내질 url
+                    .maximumSessions(1) // 한 계졍으로 접근 가능한 개수
+                        .maxSessionsPreventsLogin(true) //true 시 추가 로그인 허용 x
+                        .expiredUrl("/")  //외부에서 로그인 시도시 기존 앱에서 보내질 url
+                .and()
+                    .sessionCreationPolicy()//세션 생선 전략
+                    ;
+                    */
+
+
        // SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);//ThreadLocal 하위 범위까지 공유하도록 설정
     }
 
