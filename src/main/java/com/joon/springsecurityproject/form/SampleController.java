@@ -1,6 +1,10 @@
 package com.joon.springsecurityproject.form;
 
+import com.joon.springsecurityproject.account.Account;
+import com.joon.springsecurityproject.account.UserAccount;
+import com.joon.springsecurityproject.common.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,11 +17,14 @@ public class SampleController {
     @Autowired
     SampleService sampleService;
     @GetMapping("/")
-    public String index(Model model, Principal principal){
-        if(principal==null){
+  //  public String index(Model model, Principal principal){ 변경 전
+  //   public String index(Model model, @AuthenticationPrincipal UserAccount userAccount){
+    public String index(Model model,@CurrentUser Account userAccount){
+
+            if(userAccount==null){
             model.addAttribute("message", "Hello Spring Security");
         }else{
-            model.addAttribute("message", "Hello "+principal.getName());
+            model.addAttribute("message", "Hello "+userAccount.getUsername());
         }
         return "index";
     }

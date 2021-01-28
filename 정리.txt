@@ -590,3 +590,25 @@ public class MethodSecurity extends GlobalMethodSecurityConfiguration {
         return super.authenticationManagerBean();
     }
 -------------------------------------------------------------------------------------
+45.	@AuthenticationPrincipal
+
+사용자에 정보를 Principal 말고 다른 유형 으로 받는 방법
+ //  public String index(Model model, Principal principal){ 변경 전
+  // public String index(Model model, @AuthenticationPrincipal UserAccount userAccount){
+    public String index(Model model,@CurrentUser Account userAccount){
+
+    }
+
+public class UserAccount extends User {
+    private Account account;
+    public UserAccount(Account account){
+        super(account.getUsername(), account.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_"+account.getRole())));
+        this.account=account;
+    }
+    public Account getAccount() {
+        return account;
+    }
+}
+다음 과 같이 User 클래스를 상속 받아서 사용
+-------------------------------------------------------------------------------------
+

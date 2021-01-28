@@ -25,11 +25,12 @@ public class AccountService implements UserDetailsService {
             throw new UsernameNotFoundException(username);
         }
         Account findAccount=account.get();
-        return  User.builder()
+   /*     return  User.builder()
                     .username(findAccount.getUsername())
                     .password(findAccount.getPassword())
                     .roles(findAccount.getRole())
-                    .build();
+                    .build();*/
+        return new UserAccount(findAccount);
     }
 
     public Account createUser(Account account) {
